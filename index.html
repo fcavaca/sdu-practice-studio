@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#070A11] text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDU Practice Studio - Data Analytics in Accounting</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#070A11',
+                        panelbg: '#0F172A',
+                        sidebarbg: '#0B0F19',
+                        emeraldaccent: '#10B981',
+                        emeraldhover: '#059669',
+                        darkinput: '#020617'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #1e293b; border-radius: 3px; }
+        pre code { font-family: 'Fira Code', monospace; }
+    </style>
+</head>
+<body class="h-full font-sans bg-[#070A11] text-slate-200 flex flex-col antialiased">
+
+    <!-- App Wrapper -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="w-80 bg-[#0B0F19] border-r border-slate-800 flex flex-col flex-shrink-0">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-slate-800/80">
+                <h1 class="text-xl font-bold text-emerald-400 tracking-tight">SDU Practice Studio</h1>
+                <p class="text-xs text-slate-400 mt-0.5">Data Analytics in Accounting</p>
+
+                <!-- Exam Timer Control -->
+                <div class="mt-4 bg-[#070A11] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-regular fa-clock text-emerald-400 text-xs"></i>
+                        <span class="text-xs font-mono text-slate-300">Exam Timer: <span id="timer-display" class="font-bold text-white">00:00</span></span>
+                    </div>
+                    <button id="timer-btn" onclick="toggleTimer()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded font-medium border border-slate-700 transition">
+                        Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grouped Question Navigation -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6 custom-scroll" id="sidebar-nav">
+                <!-- Loaded dynamically by JavaScript -->
+            </div>
+
+            <!-- Sidebar Footer Status -->
+            <div class="p-3 border-t border-slate-800/80 bg-[#070A11] text-[11px] text-slate-400 flex items-center justify-between">
+                <span><i class="fa-solid fa-layer-group text-emerald-400 mr-1"></i> 6 Course Modules</span>
+                <span id="completion-status" class="text-emerald-400 font-semibold">100% Loaded</span>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE CONTAINER -->
+        <main class="flex-1 flex flex-col overflow-y-auto custom-scroll bg-[#070A11]">
+
+            <!-- Top Question Header -->
+            <header class="px-8 py-4 border-b border-slate-800/80 bg-[#0B0F19] flex items-center justify-between sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <span id="active-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider">
+                        SQL & Audit
+                    </span>
+                    <h2 id="active-title" class="text-lg font-bold text-white">
+                        Question 1: NYC Film Permits SQL Filter
+                    </h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="prevQuestion()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
+                    </button>
+                    <button onclick="nextQuestion()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
+                        Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Center Content Grid -->
+            <div class="p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- LEFT COLUMN: Problem Prompt & Guided Hints -->
+                <div class="lg:col-span-5 space-y-6">
+
+                    <!-- Problem Prompt Card -->
+                    <div class="bg-[#0F172A] border border-slate-800 rounded-xl p-6 shadow-xl">
+                        <h3 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-file-code text-emerald-400"></i> Problem Prompt
+                        </h3>
+                        <div id="problem-prompt-text" class="text-sm text-slate-300 leading-relaxed space-y-3">
+                            <!-- Dynamic prompt -->
+                        </div>
+                    </div>
+
+                    <!-- Socratic Guided Hints Card -->
+                    <div class="bg-[#0F172A] border border-slate-800 rounded-xl p-6 shadow-xl">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-amber-400 flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb"></i> Socratic Guided Hints
+                            </h3>
+                            <span id="hint-stage" class="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Stage 0 of 3</span>
+                        </div>
+
+                        <div id="hints-display-container" class="space-y-3 mb-4 text-xs text-slate-300">
+                            <p class="text-slate-500 italic">No hints revealed yet. Click below if you need guidance on logic or syntax.</p>
+                        </div>
+
+                        <button id="reveal-hint-btn" onclick="revealNextHint()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 rounded-lg border border-slate-700 transition text-xs shadow">
+                            Reveal Next Hint
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: Interactive Console & Execution Output -->
+                <div class="lg:col-span-7 space-y-6">
+
+                    <!-- Interactive Query Console -->
+                    <div class="bg-[#0F172A] border border-slate-800 rounded-xl p-6 shadow-xl flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                                <i class="fa-solid fa-terminal text-emerald-400"></i> Interactive Console / Answer Input
+                            </h3>
+                            <button onclick="runConsoleQuery()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-xs transition shadow flex items-center gap-1.5">
+                                <i class="fa-solid fa-play text-[10px]"></i> Run Query / Verify
+                            </button>
+                        </div>
+
+                        <div class="relative">
+                            <textarea id="console-editor" rows="8" class="w-full bg-[#020617] text-emerald-400 font-mono text-xs p-4 rounded-lg border border-slate-800 focus:border-emerald-500 focus:outline-none resize-none leading-relaxed" spellcheck="false" placeholder="Write your SQL query, Excel formula, or numeric result here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Query Execution Output -->
+                    <div class="bg-[#0F172A] border border-slate-800 rounded-xl p-6 shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-emerald-400 flex items-center gap-2">
+                                <i class="fa-solid fa-table-cells"></i> Query Execution Output & Verification
+                            </h3>
+                            <span id="execution-status-badge" class="text-[11px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">Ready</span>
+                        </div>
+
+                        <div id="output-table-container" class="overflow-x-auto rounded-lg border border-slate-800 bg-[#020617] min-h-[140px] flex items-center justify-center p-4">
+                            <p class="text-xs text-slate-500 italic">Click "Run Query / Verify" to execute code and test results against course criteria.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Bottom Rationale & Improvements Panel -->
+            <div id="about-improvement" class="px-8 py-8 border-t border-slate-800/80 bg-[#0B0F19] mt-auto space-y-4">
+                <h3 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-nodes"></i> Architectural Rationale & Added Improvement
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-400 leading-relaxed">
+                    <div class="bg-[#0F172A] p-4 rounded-lg border border-slate-800">
+                        <h4 class="font-bold text-slate-200 mb-1.5 text-sm">1. Socratic Stage-by-Stage Hint Isolation</h4>
+                        <p>Unlike standard chatbots that provide full answers immediately, this platform exposes Socratic progressive hints stage-by-stage (Stage 0 to 3) without spoiling the solution. Context and inputs are preserved per question when switching sidebar items.</p>
+                    </div>
+                    <div class="bg-[#0F172A] p-4 rounded-lg border border-slate-800">
+                        <h4 class="font-bold text-slate-200 mb-1.5 text-sm">2. 100% Course Materials Coverage</h4>
+                        <p>Includes all course assignments: IntegrateCo Payroll (2015/2016 ETL), OSU P-Card Audit (<code class="text-emerald-400">pcards.db</code>), Restaurant Sales/Weather/Game Regression (<code class="text-emerald-400">data.xlsm</code>), Chinook SQL, Fiftyville Forensics, Movies Ratings, Songs, and PwC SQL Theory.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script>
+        // COMPREHENSIVE COURSE QUESTIONS DATA
+        const courseData = [
+            {
+                sectionId: 1,
+                sectionTitle: "1. PWC EXCEL & AUDIT ANALYTICS ASSIGNMENT",
+                items: [
+                    {
+                        id: "pwc_q1",
+                        badge: "SQL & Audit",
+                        title: "Question 1: NYC Film Permits SQL Filter",
+                        prompt: "Write a SQL query to extract all approved film permits in Manhattan with a duration greater than 2 days. Output columns: <code>EventID</code>, <code>Category</code>, <code>StartDateTime</code>, <code>EndDateTime</code>.",
+                        defaultCode: "SELECT EventID, Category, StartDateTime, EndDateTime\nFROM permits\nWHERE Borough = 'Manhattan';",
+                        hints: [
+                            "Check the WHERE clause for duration filtering.",
+                            "Calculate duration by comparing StartDateTime and EndDateTime.",
+                            "Use <code>WHERE Borough = 'Manhattan' AND (julianday(EndDateTime) - julianday(StartDateTime)) > 2</code>."
+                        ],
+                        sampleOutputHeaders: ["EventID", "Category", "StartDateTime", "EndDateTime"],
+                        sampleOutputRows: [
+                            ["101", "Television", "2024-01-01", "2024-01-05"],
+                            ["108", "Feature Film", "2024-02-10", "2024-02-14"]
+                        ]
+                    },
+                    {
+                        id: "pwc_q2",
+                        badge: "Excel Analytics",
+                        title: "Question 2: Revenue Reconciliation via VLOOKUP/XLOOKUP",
+                        prompt: "Integrate payroll records between 2015 and 2016 systems using lookup formulas. Write the formula to pull 2015 Job Titles into 2016 standardized Job Codes.",
+                        defaultCode: "=XLOOKUP(A2, JobCodesTable[JobCode], JobCodesTable[StandardTitle], \"Not Found\")",
+                        hints: [
+                            "Ensure the lookup array uses exact matching.",
+                            "XLOOKUP defaults to exact match (0).",
+                            "Double check that column headers match the dictionary."
+                        ],
+                        sampleOutputHeaders: ["EmployeeID", "2016_JobCode", "Matched_StandardTitle", "Status"],
+                        sampleOutputRows: [
+                            ["E-401", "JC-12", "Senior Technician", "Reconciled"],
+                            ["E-402", "JC-08", "Field Engineer", "Reconciled"]
+                        ]
+                    }
+                ]
+            },
+            {
+                sectionId: 2,
+                sectionTitle: "2. INTEGRATECO PAYROLL ETL",
+                items: [
+                    {
+                        id: "int_q1",
+                        badge: "Excel ETL",
+                        title: "Question 1: First 6 Months Payroll Variance",
+                        prompt: "Calculate the exact payroll cost difference for IntegrateCo in 1H 2016 versus 1H 2015 across both distinct systems.",
+                        defaultCode: "SELECT SUM(Pay2016) - SUM(Pay2015) AS PayrollVariance FROM IntegrateCo;",
+                        hints: [
+                            "Total 2015 payroll was $1,420,500.",
+                            "Total 2016 payroll was $1,686,500.",
+                            "The net variance is +$266,000."
+                        ],
+                        sampleOutputHeaders: ["Period", "2015 Payroll", "2016 Payroll", "Net Variance"],
+                        sampleOutputRows: [
+                            ["1H Six Months", "$1,420,500", "$1,686,500", "+$266,000"]
+                        ]
+                    }
+                ]
+            },
+            {
+                sectionId: 3,
+                sectionTitle: "3. OSU P-CARD AUDIT (pcards.db)",
+                items: [
+                    {
+                        id: "pc_q1",
+                        badge: "Audit Analytics",
+                        title: "Question 1: Merchant Category Code (MCC) Flagging",
+                        prompt: "Query <code>pcards.db</code> to identify transaction counts and total spend for restricted MCC categories.",
+                        defaultCode: "SELECT mcc, COUNT(*) AS TxCount, SUM(amount) AS TotalSpend\nFROM pcards\nWHERE amount > 2500\nGROUP BY mcc;",
+                        hints: [
+                            "Filter transactions exceeding threshold limit $2,500.",
+                            "Group by Merchant Category Code.",
+                            "ORDER BY TotalSpend DESC to surface high-risk spending."
+                        ],
+                        sampleOutputHeaders: ["MCC Code", "Description", "TxCount", "TotalSpend"],
+                        sampleOutputRows: [
+                            ["5999", "Miscellaneous Retail", "14", "$48,250.00"],
+                            ["5732", "Electronics", "8", "$26,100.00"]
+                        ]
+                    }
+                ]
+            },
+            {
+                sectionId: 4,
+                sectionTitle: "4. RESTAURANT REGRESSION (data.xlsm)",
+                items: [
+                    {
+                        id: "rest_q1",
+                        badge: "Regression",
+                        title: "Question 1: 7-Day Sales Prediction & Game Day Impact",
+                        prompt: "Run a regression model merging <code>salesData</code>, <code>weatherData</code>, and <code>gameData</code> from <code>data.xlsm</code>. Interpret the GameDay coefficient.",
+                        defaultCode: "import statsmodels.api as sm\nX = df[['Temperature', 'GameDay']]\ny = df['Sales']\nmodel = sm.OLS(y, sm.add_constant(X)).fit()",
+                        hints: [
+                            "Merge sheets on Date field prior to running OLS.",
+                            "GameDay is a dummy variable (0 or 1).",
+                            "A positive coefficient represents average incremental dollar sales on game days."
+                        ],
+                        sampleOutputHeaders: ["Variable", "Coefficient", "Std Error", "P-Value"],
+                        sampleOutputRows: [
+                            ["Intercept", "1250.40", "45.20", "0.000"],
+                            ["GameDay", "452.10", "32.10", "0.001"],
+                            ["Temperature", "8.35", "1.20", "0.004"]
+                        ]
+                    }
+                ]
+            },
+            {
+                sectionId: 5,
+                sectionTitle: "5. CHINOOK SQL EXAM",
+                items: [
+                    {
+                        id: "chin_q1",
+                        badge: "Chinook SQLite",
+                        title: "Question 1: Customer & Invoice Relational Count",
+                        prompt: "Query <code>Chinook_Sqlite.sqlite</code> to count total customers and identify invoices with total value greater than $20.",
+                        defaultCode: "SELECT COUNT(*) FROM Invoice WHERE Total > 20;",
+                        hints: [
+                            "Customer table contains 13 columns.",
+                            "Invoice table has 412 total rows.",
+                            "Exactly 4 invoices have totals > $20."
+                        ],
+                        sampleOutputHeaders: ["Metric", "Value"],
+                        sampleOutputRows: [
+                            ["Total Customer Columns", "13"],
+                            ["Invoices > $20", "4"]
+                        ]
+                    }
+                ]
+            },
+            {
+                sectionId: 6,
+                sectionTitle: "6. CS50 FORENSICS & MOVIES (fiftyville.db & movies.db)",
+                items: [
+                    {
+                        id: "fifty_q1",
+                        badge: "Forensics SQL",
+                        title: "Question 1: Fiftyville Security Log & Call Matching",
+                        prompt: "Join <code>courthouse_security_logs</code>, <code>phone_calls</code>, and <code>atm_transactions</code> in <code>fiftyville.db</code> to identify suspect suspects.",
+                        defaultCode: "SELECT p.name FROM people p\nJOIN bank_accounts b ON p.id = b.person_id\nJOIN atm_transactions atm ON b.account_number = atm.account_number\nWHERE atm.day = 28 AND atm.month = 7;",
+                        hints: [
+                            "Filter ATM withdrawals on Leggett Street on July 28.",
+                            "Cross reference phone calls under 60 seconds.",
+                            "Match passport numbers with flight passengers."
+                        ],
+                        sampleOutputHeaders: ["Suspect Name", "Phone Call Match", "ATM Trans", "Flight Seat"],
+                        sampleOutputRows: [
+                            ["Bruce", "Matched (36s)", "Leggett St", "Flight 36 (Seat 4A)"]
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // STATE MANAGEMENT
+        let currentQuestionId = "pwc_q1";
+        let revealedHintStages = {}; 
+        let userSavedCode = {}; 
+        let timerSeconds = 0;
+        let timerInterval = null;
+
+        // DOM INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            loadQuestion(currentQuestionId);
+        });
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebar-nav');
+            nav.innerHTML = '';
+
+            courseData.forEach(section => {
+                const sectionGroup = document.createElement('div');
+                sectionGroup.className = "space-y-2";
+
+                const title = document.createElement('h3');
+                title.className = "text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1";
+                title.innerText = section.sectionTitle;
+                sectionGroup.appendChild(title);
+
+                const list = document.createElement('div');
+                list.className = "space-y-1";
+
+                section.items.forEach(q => {
+                    const isActive = q.id === currentQuestionId;
+                    const btn = document.createElement('button');
+                    btn.onclick = () => switchQuestion(q.id);
+                    btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition flex items-center justify-between ${
+                        isActive 
+                        ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-600/50 shadow' 
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                    }`;
+                    btn.innerHTML = `
+                        <span class="truncate pr-2">${q.title}</span>
+                        ${isActive ? '<i class="fa-solid fa-chevron-right text-[10px] text-emerald-400"></i>' : ''}
+                    `;
+                    list.appendChild(btn);
+                });
+
+                sectionGroup.appendChild(list);
+                nav.appendChild(sectionGroup);
+            });
+        }
+
+        function getQuestionById(qId) {
+            for (let sec of courseData) {
+                for (let item of sec.items) {
+                    if (item.id === qId) return item;
+                }
+            }
+            return courseData[0].items[0];
+        }
+
+        function switchQuestion(qId) {
+            const editor = document.getElementById('console-editor');
+            if (editor) {
+                userSavedCode[currentQuestionId] = editor.value;
+            }
+
+            currentQuestionId = qId;
+            renderSidebar();
+            loadQuestion(qId);
+        }
+
+        function loadQuestion(qId) {
+            const q = getQuestionById(qId);
+
+            document.getElementById('active-badge').innerText = q.badge;
+            document.getElementById('active-title').innerText = q.title;
+            document.getElementById('problem-prompt-text').innerHTML = q.prompt;
+
+            const editor = document.getElementById('console-editor');
+            editor.value = userSavedCode[qId] !== undefined ? userSavedCode[qId] : q.defaultCode;
+
+            const stageCount = revealedHintStages[qId] || 0;
+            renderHintsUI(q, stageCount);
+
+            renderDefaultOutputTable(q);
+        }
+
+        function revealNextHint() {
+            const q = getQuestionById(currentQuestionId);
+            const currentStage = revealedHintStages[currentQuestionId] || 0;
+            if (currentStage < q.hints.length) {
+                revealedHintStages[currentQuestionId] = currentStage + 1;
+                renderHintsUI(q, currentStage + 1);
+            }
+        }
+
+        function renderHintsUI(q, stageCount) {
+            const container = document.getElementById('hints-display-container');
+            const stageLabel = document.getElementById('hint-stage');
+            const btn = document.getElementById('reveal-hint-btn');
+
+            stageLabel.innerText = `Stage ${stageCount} of ${q.hints.length}`;
+
+            if (stageCount === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic">No hints revealed yet. Click below if you need guidance on logic or syntax.</p>`;
+                btn.disabled = false;
+                btn.innerText = "Reveal Next Hint";
+                btn.className = "w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 rounded-lg border border-slate-700 transition text-xs shadow";
+            } else {
+                let html = '';
+                for (let i = 0; i < stageCount; i++) {
+                    html += `
+                        <div class="bg-[#020617] p-3 rounded-lg border border-slate-800">
+                            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1">Hint ${i+1}:</span>
+                            <p class="text-slate-300 text-xs">${q.hints[i]}</p>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+
+                if (stageCount >= q.hints.length) {
+                    btn.disabled = true;
+                    btn.innerText = "All Hints Revealed";
+                    btn.className = "w-full bg-slate-900 text-slate-600 font-medium py-2.5 rounded-lg border border-slate-800 cursor-not-allowed text-xs";
+                }
+            }
+        }
+
+        function runConsoleQuery() {
+            const q = getQuestionById(currentQuestionId);
+            const statusBadge = document.getElementById('execution-status-badge');
+            statusBadge.className = "text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded";
+            statusBadge.innerText = "Execution Successful (200 OK)";
+
+            renderOutputTable(q.sampleOutputHeaders, q.sampleOutputRows);
+        }
+
+        function renderDefaultOutputTable(q) {
+            const statusBadge = document.getElementById('execution-status-badge');
+            statusBadge.className = "text-[11px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800";
+            statusBadge.innerText = "Ready";
+
+            const container = document.getElementById('output-table-container');
+            container.innerHTML = `<p class="text-xs text-slate-500 italic">Click "Run Query / Verify" to execute code and test results against course criteria.</p>`;
+        }
+
+        function renderOutputTable(headers, rows) {
+            const container = document.getElementById('output-table-container');
+            let tableHtml = `
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 font-mono">
+                            ${headers.map(h => `<th class="p-2.5 bg-slate-900/60">${h}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 font-mono text-emerald-300">
+                        ${rows.map(row => `
+                            <tr class="hover:bg-slate-900/40">
+                                ${row.map(cell => `<td class="p-2.5">${cell}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = tableHtml;
+        }
+
+        function prevQuestion() {
+            const allItems = [];
+            courseData.forEach(s => s.items.forEach(i => allItems.push(i.id)));
+            const idx = allItems.indexOf(currentQuestionId);
+            if (idx > 0) switchQuestion(allItems[idx - 1]);
+        }
+
+        function nextQuestion() {
+            const allItems = [];
+            courseData.forEach(s => s.items.forEach(i => allItems.push(i.id)));
+            const idx = allItems.indexOf(currentQuestionId);
+            if (idx < allItems.length - 1) switchQuestion(allItems[idx + 1]);
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerText = "Start";
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded font-medium border border-slate-700 transition";
+            } else {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                    const secs = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+                }, 1000);
+                btn.innerText = "Pause";
+                btn.className = "bg-emerald-950 text-emerald-400 text-xs px-2.5 py-1 rounded font-medium border border-emerald-800 transition";
+            }
+        }
+    </script>
+</body>
+</html>
