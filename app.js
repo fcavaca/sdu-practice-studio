@@ -1,4 +1,4 @@
-/* SDU Practice Studio — vanilla JS, no build step.
+﻿/* SDU Practice Studio — vanilla JS, no build step.
    The added functionality is "Check my answer": a deterministic check of a student's answer against an
    answer key computed from the real course files (see builder/build_site.py). SQL is executed in the
    browser with sql.js and compared with the reference result using a fingerprint: row/column counts,
@@ -219,7 +219,7 @@ function viewHome() {
     <div class="grid">${Object.entries(BANK.datasets).map(([k, d]) => `
       <div class="card"><b>${esc(d.name)}</b> <span class="chip">${d.kind === "sql" ? "SQL" : "Excel"}</span>
       <div class="muted" style="font-size:13px;margin-top:4px">${BANK.questions.filter((q) => q.dataset === k).length} questions</div>
-      <div style="font-size:13px;margin-top:6px">${d.files.map((f) => `<a href="downloads/${encodeURIComponent(f)}" download>${esc(f)}</a>`).join(" · ") || "<span class='muted'>runs in the browser; the original file is on the course page</span>"}</div></div>`).join("")}
+      <div style="font-size:13px;margin-top:6px">${d.files.map((f) => `<a href="${encodeURIComponent(f)}" download>${esc(f)}</a>`).join(" · ") || "<span class='muted'>runs in the browser; the original file is on the course page</span>"}</div></div>`).join("")}
     </div>`;
 }
 
@@ -276,7 +276,7 @@ function verdictHtml(v) {
 function questionHtml(q, ctx) {
   const ds = BANK.datasets[q.dataset];
   const inExam = !!ctx.exam;
-  const files = ds.files.map((f) => `<a href="downloads/${encodeURIComponent(f)}" download>${esc(f)}</a>`).join(" · ");
+  const files = ds.files.map((f) => `<a href="${encodeURIComponent(f)}" download>${esc(f)}</a>`).join(" · ");
   let body = "";
   if (q.check === "result" || (q.subject === "SQL")) {
     body += `

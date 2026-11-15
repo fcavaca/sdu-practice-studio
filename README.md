@@ -21,9 +21,11 @@ Practice exams for *Data Analytics in Accounting* (SDU), with instant, determini
 |---|---|
 | `index.html`, `app.js` | The whole site (no build step, no server) |
 | `questions.json` | Question bank, exams and answer keys |
-| `data/` | Course databases, gzipped (Movies is split into two parts because of GitHub's 25 MB upload limit) |
-| `downloads/` | Datasets for the Excel questions (solution sheets removed) |
-| `builder/build_site.py` | Builds `questions.json` and `data/` from the course materials and checks the keys against the official course answers |
+| `*.sqlite.gz`, `*.sqlite.gz.partN` | Course databases, gzipped. Movies and P-cards are split into parts of 15 MB or less for GitHub's web upload; the page joins the parts again. |
+| `*.csv`, `*.xlsx`, `chinook.sqlite`, `songs.sqlite` | Datasets students download for the Excel questions (solution sheets removed) |
+| `build_site.py` | Builds `questions.json` and the database files from the course materials, and checks the keys against the official course answers |
+
+All files sit in the repository root because GitHub's web upload does not keep folders.
 
 ## Rebuilding
 From the project folder that holds `Materials/`: `python builder/build_site.py`. Requires pandas, openpyxl and statsmodels.
