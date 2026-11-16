@@ -483,8 +483,8 @@ function viewAbout() {
   <p>The <a href="#/selftest">self-test page</a> runs every reference query through the browser checker (all must pass) and then runs typical student mistakes, which must all be flagged. You can run it yourself.</p>
   <div class="card" id="evidence"><b>Result when the site was built (16 Nov 2026)</b><ul style="margin:6px 0 0">
     <li><b>51 of 51</b> SQL answer keys (Chinook, Songs, Movies, P-cards) pass the browser checker. The fingerprint computed in the browser is identical to the one computed from the course files.</li>
-    <li><b>14 of 14</b> typical mistakes that change the result were flagged, with a pointer to the cause. Examples: WHERE instead of HAVING, a forgotten join condition (2,065 rows instead of 35), LIKE '%C%' instead of 'C%', a duplicated join that inflated units from 190 to 1,690, and a wrong sort order.</li>
-    <li><b>5</b> variants that are wrong in general but give the identical result on the course data were accepted. One example is <code>&gt;=</code> instead of <code>&gt;</code> when no value sits on the boundary. This is the limit of any result-based check. The builder therefore asserts that every HAVING filter in the bank removes at least one row, so those questions do test the filter.</li>
+    <li><b>15 of 15</b> typical mistakes that change the result were flagged, with a pointer to the cause. Examples: WHERE instead of HAVING, a forgotten join condition (2,065 rows instead of 35), LIKE '%C%' instead of 'C%', a duplicated join that inflated units from 190 to 1,690, and a wrong sort order.</li>
+    <li><b>4</b> variants that are wrong in general but give the identical result on the course data were accepted. One example is <code>&gt;=</code> instead of <code>&gt;</code> when no value sits on the boundary. This is the limit of any result-based check. The builder therefore asserts that every HAVING filter in the bank removes at least one row, so those questions do test the filter.</li>
   </ul></div>
   </div>`;
 }
